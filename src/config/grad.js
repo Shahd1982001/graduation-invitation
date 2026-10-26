@@ -7,18 +7,17 @@ export const grad = {
   joy: 'بعد سنواتٍ من الجهد والسهر والصبر، وبفضل الله وتوفيقه، حان وقت الحصاد، ويسعدنا أن نشارككم فرحة التخرّج.',
   verse: { text: 'وَقُل رَّبِّ زِدْنِي عِلْمًا', ref: 'سورة طه — الآية 114' },
   invite: 'يشرّفنا حضوركم',
-  dateTime: '2026-12-17T18:00:00+02:00',
+  dateTime: '2026-12-17T00:00:00+02:00',   // 12 منتصف الليل بتوقيت ليبيا
   timeZone: 'Africa/Tripoli',
   placeName: 'مسرح الكلية',
   placeDetail: 'كلية تقنية المعلومات — جامعة طرابلس',
   city: 'طريق الجامعة، سيدي المصري — طرابلس',
-  // موقع كلية تقنية المعلومات — جامعة طرابلس (إحداثيات من OpenStreetMap)
-  mapsUrl: 'https://www.google.com/maps/search/?api=1&query=32.8548397,13.2183561',
-  // الاتجاهات من موقع الحاضر إلى الكلية
-  directionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=32.8548397,13.2183561',
-  websiteUrl: 'https://uot.edu.ly/it/',
+  // 32°51'17.4"N 13°13'06.1"E — كلية تقنية المعلومات، جامعة طرابلس
+  mapsUrl: 'https://www.google.com/maps/search/?api=1&query=32.8548333,13.2183611',
   notes: ['نسعد بدعواتكم ومحبتكم قبل حضوركم.'],
   thanks: 'شاكرين لكم من القلب',
   rsvp: { maxCompanions: 3 },
-  autoAdvanceMs: 6500,
+  // بطاقة «نموذج عرض» — خليها null لتختفي
+  demo: { badge: 'نموذج عرض', note: 'نموذج دعوة جاهز للتخصيص', ctaText: 'اطلب دعوتك', ctaUrl: '' },
+  autoAdvanceMs: 3800,   // مدة الوقوف بين كل صفحة وأخرى (ميلي ثانية)
 }

@@ -6,7 +6,7 @@ import CalendarCountdown from './CalendarCountdown.jsx'
 import RSVPDialog from './RSVPDialog.jsx'
 
 const COUNT = 3
-const D = { slide: 900, creep: 1600, drag: 0 }
+const D = { slide: 780, creep: 1150, drag: 0 }
 
 // بداية «تركيز» على صفحة الاسم، ثم انتقال هادئ تحرّكه الجيران
 export default function Filmstrip({ reduce }) {
@@ -132,6 +132,7 @@ export default function Filmstrip({ reduce }) {
           <h1 className="gname" data-a>{grad.name}</h1>
           <p className="deg" data-a>{grad.degree}<br />{grad.university}</p>
           <p className="date-line" data-a>{t.day} {t.month} {t.year}</p>
+          {grad.demo?.badge && <p className="demo-badge" data-a>{grad.demo.badge}</p>}
         </>
       )
     }
@@ -160,11 +161,7 @@ export default function Filmstrip({ reduce }) {
           <a className="btn-gold" href={grad.mapsUrl} target="_blank" rel="noopener noreferrer">عرض الموقع</a>
           <button className="btn-gold" onClick={() => setModal(true)}>تأكيد الحضور</button>
         </div>
-        <p className="mini-links" data-a>
-          <a href={grad.directionsUrl} target="_blank" rel="noopener noreferrer">الاتجاهات إلى القاعة</a>
-          <span aria-hidden="true">·</span>
-          <a href={grad.websiteUrl} target="_blank" rel="noopener noreferrer">موقع الكلية</a>
-        </p>
+
       </>
     )
   }
@@ -219,6 +216,15 @@ export default function Filmstrip({ reduce }) {
       </nav>
 
       {!touched && !reduce && <p className="swipe-hint" aria-hidden="true">اسحبي يمين ويسار</p>}
+
+      {grad.demo?.note && (
+        <footer className="credit">
+          <span>{grad.demo.note}</span>
+          {grad.demo.ctaUrl && (
+            <a href={grad.demo.ctaUrl} target="_blank" rel="noopener noreferrer">{grad.demo.ctaText}</a>
+          )}
+        </footer>
+      )}
 
       {modal && <RSVPDialog onClose={() => setModal(false)} />}
     </>
