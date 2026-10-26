@@ -153,8 +153,8 @@ export default function Filmstrip({ reduce }) {
       >
         {Array.from({ length: COUNT }, (_, i) => {
           const x = (i - index) * step + drag
-          const dist = Math.abs(x) / step
-          const zoomed = Math.max(0, 1 - dist)
+          const dist = step > 0 ? Math.abs(x) / step : i === index ? 0 : 2
+          const zoomed = Math.min(1, Math.max(0, 1 - dist))
           const tilt = Math.max(-6, Math.min(6, (drag / step) * -5))
           return (
             <section
@@ -164,7 +164,7 @@ export default function Filmstrip({ reduce }) {
                 transform: `translate3d(${x}px,0,0) scale(${0.88 + zoomed * 0.12}) rotateY(${tilt}deg)`,
                 transitionDuration: `${dragging ? D.drag : auto ? D.creep : D.slide}ms`,
                 opacity: i === index ? 1 : 0.72,
-                zIndex: 10 - Math.round(dist * 2),
+                zIndex: Math.max(1, 10 - Math.round((Number.isFinite(dist) ? dist : 2) * 2)),
                 pointerEvents: i === index ? 'auto' : 'none',
               }}
               aria-hidden={i !== index}

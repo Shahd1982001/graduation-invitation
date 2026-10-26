@@ -77,7 +77,8 @@ function rsvpDevServer() {
 }
 
 export default defineConfig({
-  plugins: [react(), rsvpDevServer()],
+  // fastRefresh معطّل: يمنع أخطاء «حالة قديمة» بعد تعديل الملفات أثناء المعاينة
+  plugins: [react({ fastRefresh: false }), rsvpDevServer()],
   server: { host: '0.0.0.0', port: 5173, allowedHosts: true },
   preview: { host: '0.0.0.0', allowedHosts: true },
 })
