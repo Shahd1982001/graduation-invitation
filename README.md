@@ -19,15 +19,32 @@ npm run dev
 - الأبعاد المفضّلة: 1000×1300 تقريبًا، عمودية، وأقل من 250KB.
 
 ## القيم في `src/config/grad.js`
-الاسم، التخصص، الجامعة، السنة، نص الفرحة، الآية، التاريخ والوقت (توقيت ليبيا)، القاعة، رابط الخرائط، عدد المرافقين، ومدة الانتقال التلقائي.
+الاسم، التخصص، الجامعة (`جامعة طرابلس`)، السنة، نص الفرحة، الآية، التاريخ والوقت (17 ديسمبر 2026 — 6:00 مساءً بتوقيت ليبيا)، القاعة (`مسرح الكلية` + `كلية تقنية المعلومات — جامعة طرابلس`)، رابط خرائط الكلية، عدد المرافقين، ومدة الانتقال التلقائي.
 > سطر التاريخ في صفحة الاسم يُقرأ تلقائيًا من `dateTime`.
+
+## تأكيد الحضور + الـ Backend
+- زر **تأكيد الحضور** في صفحة التفاصيل يفتح نافذة الحضور (الاسم، حاضر/معتذر، عدد المرافقين) ويرسل الرد إلى `POST /api/rsvp`.
+- **محليًا**: `npm run dev` يشغّل backend وهمي بسيط (middleware في `vite.config.js`) يحفظ الردود في `.data/rsvps.json`، وتقدرين تشوفينها على `http://localhost:5173/api/rsvps`.
+- **الإنتاج**: دوال Vercel في `api/`
+  - `POST /api/rsvp` — تسجيل رد (تحقق من الاسم، الوقت، عدد الأشخاص).
+  - `GET /api/rsvps?key=ADMIN_KEY` — كل الردود + ملخّص (عدد الحضور والأشخاص).
+  - `GET /api/rsvps?key=ADMIN_KEY&format=csv` — تصدير CSV لـ Excel.
+
+### النشر على Vercel
+1. ارفعي المشروع على GitHub ثم `Add New → Project` في Vercel (الإعدادات مكتشفة تلقائيًا من `vercel.json`).
+2. أضيفي متغيّرات البيئة:
+   - `UPSTASH_REDIS_REST_URL` و `UPSTASH_REDIS_REST_TOKEN` — من [Upstash Redis](https://upstash.com) (خطة مجانية) أو من Vercel KV (`KV_REST_API_URL` / `KV_REST_API_TOKEN`).
+   - `ADMIN_KEY` — كلمة سرّ خاصة بك لصفحة الردود (أي نص طويل).
+3. بعد النشر: `https://<domain>/api/rsvps?key=ADMIN_KEY` لمشاهدة الردود.
+> بدون متغيّرات Upstash، الحفظ يرجع خطأ واضح `storage_not_configured` بدل ما يضيّع الردود.
 
 ## الملفات
 - `src/components/ScrollInvite.jsx` — المشهد المصوّر ومراحل الافتتاح.
 - `src/components/Filmstrip.jsx` — شريط الصفحات الأفقي (سحب/أسهم/عجلة/نقاط).
 - `src/components/CalendarCountdown.jsx` — التقويم والعدّاد.
 - `src/components/OvalFrame.jsx` — الإطار البيضاوي الذهبي (`frame.png`) حول صورة الخريجة.
-- `src/components/RSVPDialog.jsx` + `src/services/rsvpService.js` — تأكيد الحضور (واجهة فقط، لا حفظ).
+- `src/components/RSVPDialog.jsx` + `src/services/rsvpService.js` — نافذة تأكيد الحضور وإرسالها للـ backend.
+- `api/rsvp.js` · `api/rsvps.js` · `api/_store.js` — دوال Vercel وتخزين Upstash.
 
 ## ملاحظات
 - الحركة تُلغى تلقائيًا مع «تقليل الحركة» في النظام.

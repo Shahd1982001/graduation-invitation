@@ -125,6 +125,7 @@ export default function Filmstrip({ reduce }) {
         <CalendarCountdown />
         <p className="eyebrow" data-a>مكان الحفل</p>
         <h2 className="venue" data-a>{grad.placeName}</h2>
+        <p className="place-detail" data-a>{grad.placeDetail}</p>
         <p className="city" data-a>{grad.city}</p>
         <div className="slide-actions" data-a>
           <a className="btn-gold" href={grad.mapsUrl} target="_blank" rel="noopener noreferrer">عرض الموقع</a>

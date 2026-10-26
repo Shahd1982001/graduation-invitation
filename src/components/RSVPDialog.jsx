@@ -2,11 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 import { grad } from '../config/grad.js'
 import { submitRsvp } from '../services/rsvpService.js'
 
-// واجهة أمامية فقط (لا تحفظ بيانات). للربط بـ Firestore عدّلي services/rsvpService.js
+const ERRORS = {
+  name_invalid: 'يرجى كتابة الاسم (٣ أحرف على الأقل).',
+  storage_not_configured: 'خدمة الحفظ غير مُفعّلة بعد، يرجى التواصل مع منظّمي الحفل.',
+  network: 'تعذّر الاتصال، تأكدوا من الإنترنت وحاولوا مرة أخرى.',
+}
+
 export default function RSVPDialog({ onClose }) {
   const max = grad.rsvp.maxCompanions
   const [f, setF] = useState({ name: '', attend: '', companions: 0 })
   const [err, setErr] = useState({}); const [status, setStatus] = useState('idle')
+  const [serverError, setServerError] = useState('')
   const nameRef = useRef(null)
   const set = (k, v) => setF((p) => ({ ...p, [k]: v }))
 
@@ -21,10 +27,20 @@ export default function RSVPDialog({ onClose }) {
     const e = {}
     if (f.name.trim().length < 3) e.name = 'يرجى كتابة الاسم (٣ أحرف على الأقل).'
     if (!f.attend) e.attend = 'يرجى اختيار الحضور أو الاعتذار.'
-    setErr(e); if (Object.keys(e).length) { e.name && nameRef.current?.focus(); return }
+    setErr(e); setServerError('')
+    if (Object.keys(e).length) { e.name && nameRef.current?.focus(); return }
     setStatus('sending')
-    try { await submitRsvp({ name: f.name.trim(), attending: f.attend === 'yes', companions: f.attend === 'yes' ? f.companions : 0 }); setStatus('done') }
-    catch { setStatus('error') }
+    try {
+      await submitRsvp({
+        name: f.name.trim(),
+        attending: f.attend === 'yes',
+        companions: f.attend === 'yes' ? f.companions : 0,
+      })
+      setStatus('done')
+    } catch (error) {
+      setServerError(ERRORS[error.message] || 'تعذّر الإرسال، حاولوا مرة أخرى.')
+      setStatus('idle')
+    }
   }
 
   return (
@@ -35,7 +51,10 @@ export default function RSVPDialog({ onClose }) {
         {status === 'done' ? (
           <div role="status" className="done">
             <p>{f.attend === 'yes' ? 'تم تسجيل حضوركم، ننتظركم بكل محبة.' : 'تم تسجيل اعتذاركم، شكرًا لكم.'}</p>
-            <p className="demo">نسخة تجريبية — لا يتم حفظ البيانات بصورة دائمة.</p>
+            {f.attend === 'yes' && (
+              <p className="done-sub">عدد الحضور المسجّل: <b>{f.companions + 1}</b>{f.companions ? ` (أنتم + ${f.companions} مرافقين)` : ''}</p>
+            )}
+            <p className="demo">سيصل تأكيدكم إلى منظّمي الحفل مباشرة.</p>
             <button className="btn-gold" onClick={onClose}>إغلاق</button>
           </div>
         ) : (
@@ -59,11 +78,12 @@ export default function RSVPDialog({ onClose }) {
                 <select id="g-c" value={f.companions} onChange={(e) => set('companions', +e.target.value)}>
                   {Array.from({ length: max + 1 }, (_, i) => <option key={i} value={i}>{i}</option>)}
                 </select>
+                <p className="hint-inline">إجمالي الحضور: {f.companions + 1}</p>
               </div>
             )}
             <button className="btn-gold" type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'جارٍ الإرسال…' : 'إرسال الرد'}</button>
-            {status === 'error' && <p className="err" role="alert">تعذّر الإرسال، حاولوا مرة أخرى.</p>}
-            <p className="demo">نسخة تجريبية — لا يتم حفظ البيانات بصورة دائمة.</p>
+            {serverError && <p className="err" role="alert">{serverError}</p>}
+            <p className="demo">ردّكم يُسجَّل رسميًا ويصل إلى منظّمي الحفل.</p>
           </form>
         )}
       </div>
