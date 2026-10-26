@@ -11,9 +11,12 @@ export const grad = {
   timeZone: 'Africa/Tripoli',
   placeName: 'مسرح الكلية',
   placeDetail: 'كلية تقنية المعلومات — جامعة طرابلس',
-  city: 'طرابلس، ليبيا',
-  // موقع كلية تقنية المعلومات — جامعة طرابلس على خرائط جوجل
-  mapsUrl: 'https://www.google.com/maps/search/?api=1&query=%D9%83%D9%84%D9%8A%D8%A9%20%D8%AA%D9%82%D9%86%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%B9%D9%84%D9%88%D9%85%D8%A7%D8%AA%20%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D8%B7%D8%B1%D8%A7%D8%A8%D9%84%D8%B3',
+  city: 'طريق الجامعة، سيدي المصري — طرابلس',
+  // موقع كلية تقنية المعلومات — جامعة طرابلس (إحداثيات من OpenStreetMap)
+  mapsUrl: 'https://www.google.com/maps/search/?api=1&query=32.8548397,13.2183561',
+  // الاتجاهات من موقع الحاضر إلى الكلية
+  directionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=32.8548397,13.2183561',
+  websiteUrl: 'https://uot.edu.ly/it/',
   notes: ['نسعد بدعواتكم ومحبتكم قبل حضوركم.'],
   thanks: 'شاكرين لكم من القلب',
   rsvp: { maxCompanions: 3 },

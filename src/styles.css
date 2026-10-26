@@ -142,6 +142,9 @@ img{user-select:none;-webkit-user-drag:none}
 .btn-gold:disabled{opacity:.6}
 .slide-actions{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:2px}
 .slide-actions .btn-gold{min-height:38px;padding:0 16px;font-size:.82rem;letter-spacing:0;box-shadow:0 5px 12px rgba(60,38,8,.26);white-space:nowrap}
+.mini-links{display:flex;align-items:center;justify-content:center;gap:8px;font-size:.76rem}
+.mini-links a{color:#8a6420;text-decoration:none;border-bottom:1px solid rgba(168,129,47,.45);padding-bottom:1px}
+.mini-links span{color:rgba(107,90,67,.6)}
 
 /* أزرار التنقّل */
 .pp{position:absolute;top:max(12px,env(safe-area-inset-top));left:14px;width:38px;height:38px;border-radius:50%;z-index:20;font-size:.7rem;color:#4a3720;background:rgba(250,243,228,.82);border:1px solid rgba(168,129,47,.6);box-shadow:0 3px 12px rgba(20,10,2,.4)}

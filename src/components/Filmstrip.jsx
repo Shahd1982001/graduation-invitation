@@ -160,6 +160,11 @@ export default function Filmstrip({ reduce }) {
           <a className="btn-gold" href={grad.mapsUrl} target="_blank" rel="noopener noreferrer">عرض الموقع</a>
           <button className="btn-gold" onClick={() => setModal(true)}>تأكيد الحضور</button>
         </div>
+        <p className="mini-links" data-a>
+          <a href={grad.directionsUrl} target="_blank" rel="noopener noreferrer">الاتجاهات إلى القاعة</a>
+          <span aria-hidden="true">·</span>
+          <a href={grad.websiteUrl} target="_blank" rel="noopener noreferrer">موقع الكلية</a>
+        </p>
       </>
     )
   }
