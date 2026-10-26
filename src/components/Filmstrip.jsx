@@ -12,6 +12,7 @@ const D = { slide: 900, creep: 1600, drag: 0 }
 export default function Filmstrip({ reduce }) {
   const root = useRef(null)
   const dragRef = useRef(null)
+  const dragVal = useRef(0)
   const wheelLock = useRef(0)
   const [step, setStep] = useState(380)
   const [index, setIndex] = useState(0)
@@ -72,24 +73,52 @@ export default function Filmstrip({ reduce }) {
     go(index + (d > 0 ? 1 : -1))
   }
 
-  const onPointerDown = (e) => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return
-    dragRef.current = { x: e.clientX, id: e.pointerId }
-    setDragging(true)
-    e.currentTarget.setPointerCapture?.(e.pointerId)
+  // ——— السحب: مستمعات على window بدل احتجاز المؤشر ———
+  // (احتجاز المؤشر كان يلغي حدث الضغط على الأزرار والروابط داخل الصفحة)
+  const cleanupDrag = () => {
+    window.removeEventListener('pointermove', onWinMove)
+    window.removeEventListener('pointerup', onWinEnd)
+    window.removeEventListener('pointercancel', onWinEnd)
   }
-  const onPointerMove = (e) => {
-    if (!dragRef.current) return
-    const dx = e.clientX - dragRef.current.x
-    setDrag(Math.max(-step * 1.4, Math.min(step * 1.4, dx)))
+
+  function onWinMove(e) {
+    const d = dragRef.current
+    if (!d || e.pointerId !== d.id) return
+    const dx = e.clientX - d.x
+    if (!d.active) {
+      if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - d.y)) return
+      d.active = true
+      setDragging(true)
+    }
+    dragVal.current = Math.max(-step * 1.4, Math.min(step * 1.4, dx))
+    setDrag(dragVal.current)
   }
-  const endDrag = () => {
-    if (!dragRef.current) return
+
+  function onWinEnd(e) {
+    const d = dragRef.current
+    cleanupDrag()
     dragRef.current = null
-    if (Math.abs(drag) > step * 0.22) go(index - Math.sign(drag))
+    if (!d || (e?.pointerId !== undefined && e.pointerId !== d.id)) return
+    if (d.active && Math.abs(dragVal.current) > step * 0.22) {
+      go(index - Math.sign(dragVal.current))
+    }
+    dragVal.current = 0
     setDrag(0)
     setDragging(false)
   }
+
+  const onPointerDown = (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return
+    // لا سحب فوق زر/رابط/حقل
+    if (e.target.closest('a,button,input,select,textarea,label,[role="button"]')) return
+    dragRef.current = { x: e.clientX, y: e.clientY, id: e.pointerId, active: false }
+    dragVal.current = 0
+    window.addEventListener('pointermove', onWinMove, { passive: true })
+    window.addEventListener('pointerup', onWinEnd)
+    window.addEventListener('pointercancel', onWinEnd)
+  }
+
+  useEffect(() => cleanupDrag, [])
 
   const page = (i) => {
     if (i === 0) {
@@ -146,10 +175,6 @@ export default function Filmstrip({ reduce }) {
         onKeyDown={onKeyDown}
         onWheel={onWheel}
         onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-        onPointerLeave={endDrag}
       >
         {Array.from({ length: COUNT }, (_, i) => {
           const x = (i - index) * step + drag

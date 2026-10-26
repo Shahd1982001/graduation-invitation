@@ -6,6 +6,7 @@
 *{box-sizing:border-box;margin:0}
 html,body,#root{height:100%;overflow:hidden}
 body{background:#1b1008;font-family:'Tajawal',system-ui,sans-serif;color:var(--ink);line-height:1.6;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+button,a{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
 :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 h1,h2,.verse,.joy,.gname,.month,.venue,.over{font-family:'Amiri',serif}
