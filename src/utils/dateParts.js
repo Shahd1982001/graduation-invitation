@@ -6,6 +6,6 @@ export function dateParts(iso, tz) {
   return {
     day: +p.day, month: MONTHS[+p.month - 1], year: +p.year,
     weekday: new Intl.DateTimeFormat('ar', { weekday: 'long', timeZone: tz }).format(date),
-    time: `${h % 12 || 12}:${min}`, ampm: h === 0 ? 'منتصف الليل' : h >= 12 ? 'مساءً' : 'صباحًا',
+    time: `${h % 12 || 12}:${min}`, ampm: h === 0 ? 'منتصف الليل' : h === 12 ? 'ظهرًا' : h > 12 ? 'مساءً' : 'صباحًا',
   }
 }

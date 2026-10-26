@@ -120,6 +120,14 @@ export default function Filmstrip({ reduce }) {
 
   useEffect(() => cleanupDrag, [])
 
+  // فتح خرائط جوجل مباشرة: نافذة جديدة، ولو منعها المتصفح ننتقل في نفس الصفحة
+  const openMap = (e) => {
+    e.preventDefault()
+    let win = null
+    try { win = window.open(grad.mapsUrl, '_blank', 'noopener,noreferrer') } catch { win = null }
+    if (!win) window.location.assign(grad.mapsUrl)
+  }
+
   const page = (i) => {
     if (i === 0) {
       return (
@@ -158,7 +166,13 @@ export default function Filmstrip({ reduce }) {
         <p className="place-detail" data-a>{grad.placeDetail}</p>
         <p className="city" data-a>{grad.city}</p>
         <div className="slide-actions" data-a>
-          <a className="btn-gold" href={grad.mapsUrl} target="_blank" rel="noopener noreferrer">عرض الموقع</a>
+          <a
+            className="btn-gold"
+            href={grad.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={openMap}
+          >عرض الموقع</a>
           <button className="btn-gold" onClick={() => setModal(true)}>تأكيد الحضور</button>
         </div>
 
