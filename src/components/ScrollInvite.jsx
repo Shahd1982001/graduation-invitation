@@ -1,35 +1,34 @@
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import Slides from './Slides.jsx'
-import Bow from './Bow.jsx'
+import Filmstrip from './Filmstrip.jsx'
 
+// closed (اللفافة الحقيقية على الطاولة) → untie (زوم على الفيونكة) → unroll (الورقة تتفرد) → open
 export default function ScrollInvite({ reduce }) {
-  const root = useRef(null)
-  const [phase, setPhase] = useState('closed') // closed | opening | open
-  const [open, setOpen] = useState(false)
+  const [phase, setPhase] = useState('closed')
+  const timers = useRef([])
+
+  useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
   const untie = () => {
     if (phase !== 'closed') return
-    setPhase('opening')
-    const d = reduce ? 250 : 1300
-    gsap.to(root.current.querySelector('.hint'), { autoAlpha: 0, duration: reduce ? 0.15 : 0.4 })
-    window.setTimeout(() => {
-      setOpen(true)
-      setPhase('open')
-    }, d)
+    setPhase('untie')
+    timers.current.push(window.setTimeout(() => setPhase('unroll'), reduce ? 120 : 900))
+    timers.current.push(window.setTimeout(() => setPhase('open'), reduce ? 400 : 2150))
   }
 
   return (
-    <main className={`invite ${phase}`} ref={root}>
-      <div className="bgp" aria-hidden="true" />
-      <div className={`scroll-wrap ${phase}`}>
-        <div className="scroll">
-          <div className="roller top" />
-          <div className="sheet">{phase === 'open' && <Slides open={open} reduce={reduce} />}</div>
-          <div className="roller bot" />
-          {phase !== 'open' && <button className="tie" onClick={untie} disabled={phase !== 'closed'} aria-label="اضغطي على الفيونكة لفتح الدعوة"><span className="band" /><Bow /></button>}
-        </div>
+    <main className={`invite ${phase}`}>
+      <div className="scene">
+        <img className="shot shot-closed" src="/assets/hero-scroll.jpg" alt="" draggable="false" />
+        <span className="glow" aria-hidden="true" />
+        <img className="shot shot-open" src="/assets/scroll-open.jpg" alt="" draggable="false" />
+        <span className="vellum" aria-hidden="true" />
       </div>
+
+      {phase === 'open' && <Filmstrip reduce={reduce} />}
+
+      {phase !== 'open' && (
+        <button className="bow-tap" onClick={untie} aria-label="اضغطي على الفيونكة لفتح الدعوة" />
+      )}
       {phase !== 'open' && <p className="hint" aria-live="polite">اضغطي على الفيونكة لفتح الدعوة</p>}
     </main>
   )
