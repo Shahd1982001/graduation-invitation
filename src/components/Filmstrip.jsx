@@ -122,10 +122,6 @@ export default function Filmstrip({ reduce }) {
     }
     return (
       <>
-        <OvalFrame className="small">
-          <div className="back" />
-          <img className="girl" src="/assets/girl.png" alt={`الخريجة ${grad.name}`} />
-        </OvalFrame>
         <CalendarCountdown />
         <p className="eyebrow" data-a>مكان الحفل</p>
         <h2 className="venue" data-a>{grad.placeName}</h2>
