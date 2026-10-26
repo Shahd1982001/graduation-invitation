@@ -1,35 +1,48 @@
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import Slides from './Slides.jsx'
-import Bow from './Bow.jsx'
+import Filmstrip from './Filmstrip.jsx'
+import SilkBow from './SilkBow.jsx'
 
+// مراحل الافتتاح: closed (على الطاولة) → untying (تفكّ الفيونكة) → unrolling (تتفتح اللفافة) → open
 export default function ScrollInvite({ reduce }) {
-  const root = useRef(null)
-  const [phase, setPhase] = useState('closed') // closed | opening | open
-  const [open, setOpen] = useState(false)
+  const [phase, setPhase] = useState('closed')
+  const timers = useRef([])
+
+  useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
   const untie = () => {
     if (phase !== 'closed') return
-    setPhase('opening')
-    const d = reduce ? 250 : 1300
-    gsap.to(root.current.querySelector('.hint'), { autoAlpha: 0, duration: reduce ? 0.15 : 0.4 })
-    window.setTimeout(() => {
-      setOpen(true)
-      setPhase('open')
-    }, d)
+    setPhase('untying')
+    timers.current.push(window.setTimeout(() => setPhase('unrolling'), reduce ? 150 : 980))
+    timers.current.push(window.setTimeout(() => setPhase('open'), reduce ? 500 : 2200))
   }
 
   return (
-    <main className={`invite ${phase}`} ref={root}>
-      <div className="bgp" aria-hidden="true" />
-      <div className={`scroll-wrap ${phase}`}>
-        <div className="scroll">
-          <div className="roller top" />
-          <div className="sheet">{phase === 'open' && <Slides open={open} reduce={reduce} />}</div>
-          <div className="roller bot" />
-          {phase !== 'open' && <button className="tie" onClick={untie} disabled={phase !== 'closed'} aria-label="اضغطي على الفيونكة لفتح الدعوة"><span className="band" /><Bow /></button>}
-        </div>
+    <main className={`invite ${phase}`}>
+      <div className="tabletop" aria-hidden="true" />
+      <div className="props" aria-hidden="true">
+        <img className="p-candle" src="/assets/candelabra.png" alt="" />
+        <img className="p-pearls" src="/assets/pearls.png" alt="" />
+        <img className="p-bloom" src="/assets/flower.png" alt="" />
       </div>
+
+      <div className="rollStage">
+        <div className="roll-shadow" aria-hidden="true" />
+        <div className="roll" aria-hidden="true">
+          <span className="end end-l" />
+          <span className="end end-r" />
+          <span className="grain" />
+          <span className="ribbon" />
+          <SilkBow />
+        </div>
+        {phase === 'closed' && (
+          <button className="hit" onClick={untie} aria-label="اضغطي على الفيونكة لفتح الدعوة" />
+        )}
+      </div>
+
+      <div className="sheet" aria-hidden="true" />
+
+      {phase === 'open' && <Filmstrip reduce={reduce} />}
+
       {phase !== 'open' && <p className="hint" aria-live="polite">اضغطي على الفيونكة لفتح الدعوة</p>}
     </main>
   )
