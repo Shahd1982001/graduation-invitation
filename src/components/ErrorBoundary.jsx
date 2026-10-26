@@ -1,6 +1,13 @@
 import { Component } from 'react'
 
 // حاجز أخطاء: بدل شاشة فارغة، تظهر رسالة وزرار تحديث
+// تحميل كامل مع تجاهل الكاش
+function hardReload() {
+  const { pathname, search, hash } = window.location
+  const sep = search ? '&' : '?'
+  window.location.replace(`${pathname}${search}${sep}r=${Date.now()}${hash}`)
+}
+
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props)
@@ -32,7 +39,8 @@ export default class ErrorBoundary extends Component {
         {this.state.error?.message && (
           <pre className="fallback-msg" dir="ltr">{String(this.state.error.message).slice(0, 220)}</pre>
         )}
-        <button className="btn-gold" onClick={() => window.location.reload()}>إعادة المحاولة</button>
+        <button className="btn-gold" onClick={hardReload}>إعادة المحاولة</button>
+        <button className="fallback-link" onClick={() => { try { sessionStorage.clear() } catch { /* */ } hardReload() }}>تحديث كامل</button>
       </div>
     )
   }
