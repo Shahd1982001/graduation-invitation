@@ -6,6 +6,7 @@ import { grad } from '../config/grad.js'
 // - صوت خفيف مع fade-in، وتكرار لانهائي
 // - يتذكّر اختيار الزائر (تشغيل/إيقاف) في localStorage
 // - لو الملف غير موجود يختفي الزر بصمت
+// - يدعم البدء من منتصف الملف وتحديد نهاية المقطع (startAt / endAt بالثواني)
 const KEY = 'invite-music'
 
 export default function MusicPlayer({ start }) {
@@ -13,6 +14,21 @@ export default function MusicPlayer({ start }) {
   const [available, setAvailable] = useState(true)
   const [playing, setPlaying] = useState(false)
   const volume = grad.music?.volume ?? 0.55
+  const startAt = Math.max(0, Number(grad.music?.startAt) || 0)
+  const endAt = Math.max(0, Number(grad.music?.endAt) || 0)
+
+  // البدء من نقطة محددة (مثلًا الكورس المشهور) والالتفاف عند نهاية المقطع
+  const seekStart = () => {
+    const audio = audioRef.current
+    if (!audio || !startAt) return
+    try { if (audio.currentTime < startAt) audio.currentTime = startAt } catch { /* ignore */ }
+  }
+
+  const onTimeUpdate = () => {
+    const audio = audioRef.current
+    if (!audio || !endAt || audio.currentTime < endAt) return
+    try { audio.currentTime = startAt } catch { /* ignore */ }
+  }
 
   const fadeTo = (target, ms = 900) => {
     const audio = audioRef.current
@@ -32,6 +48,7 @@ export default function MusicPlayer({ start }) {
     if (!audio) return false
     try {
       audio.volume = 0
+      if (startAt) seekStart()
       await audio.play()
       fadeTo(volume)
       setPlaying(true)
@@ -80,6 +97,8 @@ export default function MusicPlayer({ start }) {
         src={grad.music.src}
         loop
         preload="auto"
+        onLoadedMetadata={seekStart}
+        onTimeUpdate={onTimeUpdate}
         onError={() => setAvailable(false)}
       />
       <button
