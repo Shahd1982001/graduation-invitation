@@ -13,7 +13,16 @@ export default function RSVPDialog({ onClose }) {
   const [f, setF] = useState({ name: '', attend: '', companions: 0 })
   const [err, setErr] = useState({}); const [status, setStatus] = useState('idle')
   const [serverError, setServerError] = useState('')
+  const [failed, setFailed] = useState(false)
   const nameRef = useRef(null)
+  const waNumber = (grad.rsvp?.whatsapp || '').replace(/[^0-9]/g, '')
+  const waLink = waNumber
+    ? `https://wa.me/${waNumber}?text=${encodeURIComponent(
+        `تأكيد حضور — ${f.name.trim() || 'الاسم'}\n` +
+        (f.attend === 'yes' ? `سأحضر بإذن الله (${f.companions + 1} أشخاص)` : 'أعتذر عن الحضور') +
+        `\nدعوة تخرّج ${grad.name} — ${grad.year}`
+      )}`
+    : ''
   const set = (k, v) => setF((p) => ({ ...p, [k]: v }))
 
   useEffect(() => {
@@ -27,7 +36,7 @@ export default function RSVPDialog({ onClose }) {
     const e = {}
     if (f.name.trim().length < 3) e.name = 'يرجى كتابة الاسم (٣ أحرف على الأقل).'
     if (!f.attend) e.attend = 'يرجى اختيار الحضور أو الاعتذار.'
-    setErr(e); setServerError('')
+    setErr(e); setServerError(''); setFailed(false)
     if (Object.keys(e).length) { e.name && nameRef.current?.focus(); return }
     setStatus('sending')
     try {
@@ -39,6 +48,7 @@ export default function RSVPDialog({ onClose }) {
       setStatus('done')
     } catch (error) {
       setServerError(ERRORS[error.message] || 'تعذّر الإرسال، حاولوا مرة أخرى.')
+      setFailed(true)
       setStatus('idle')
     }
   }
@@ -83,6 +93,14 @@ export default function RSVPDialog({ onClose }) {
             )}
             <button className="btn-gold" type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'جارٍ الإرسال…' : 'إرسال الرد'}</button>
             {serverError && <p className="err" role="alert">{serverError}</p>}
+            {failed && waLink && (
+              <div className="field">
+                <a className="wa-btn" href={waLink} target="_blank" rel="noopener noreferrer">
+                  <span aria-hidden="true">✆</span> إرسال الرد عبر واتساب
+                </a>
+                <p className="wa-note">بديل مضمون: يفتح واتساب برسالة جاهزة فيها اسمكم وعدد المرافقين — أرسلوها وسيتم تسجيل حضوركم.</p>
+              </div>
+            )}
             <p className="demo">ردّكم يُسجَّل رسميًا ويصل إلى منظّمي الحفل.</p>
           </form>
         )}
