@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Filmstrip from './Filmstrip.jsx'
+import MusicPlayer from './MusicPlayer.jsx'
 
 // closed (اللفافة الحقيقية على الطاولة) → untie (زوم على الفيونكة) → unroll (الورقة تتفرد) → open
 export default function ScrollInvite({ reduce }) {
@@ -29,6 +30,9 @@ export default function ScrollInvite({ reduce }) {
       {phase !== 'open' && (
         <button className="bow-tap" onClick={untie} aria-label="اضغطي على الفيونكة لفتح الدعوة" />
       )}
+
+      {/* الموسيقى تبدأ بعد لمسة الفتح (المتصفحات تمنع التشغيل التلقائي بدون تفاعل) */}
+      <MusicPlayer start={phase !== 'closed'} />
       {phase !== 'open' && <p className="hint" aria-live="polite">اضغطي على الفيونكة لفتح الدعوة</p>}
     </main>
   )
