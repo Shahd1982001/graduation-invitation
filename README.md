@@ -19,8 +19,15 @@ npm run dev
 - القيمة في `mapsUrl` داخل `src/config/grad.js`.
 
 ## الموسيقى
-- **مضمَّنة بالفعل**: `public/assets/music.mp3` — مقطوعة أصلية (عود/باد هادئ بمقام عربي) مولَّدة خصيصًا لهذه الدعوة، 34 ثانية، 552KB، بدون أي حقوق محفوظة.
-- لإعادة توليدها/تغيير المقام أو الإيقاع: عدّلي `tools/make-music.mjs` ثم `node tools/make-music.mjs`.
+- **المضمَّن الآن**: `public/assets/music.mp3` — مقطع «يا هلا بالحلم» (45 ثانية) من الملف الذي رفعه صاحب الدعوة، مع تلاشٍ دخول 2ث وخروج 4ث ليتكرر بسلاسة. 630KB فقط (112kbps) بدل 8.3MB الأصلية.
+- لإعادة القص/التلاشي من الملف الأصلي:
+```bash
+FF=$(node -e "console.log(require('@ffmpeg-installer/ffmpeg').path)")
+$FF -y -ss 1 -t 45 -i original.mp3 -vn \
+  -af "afade=t=in:ss=0:d=2,afade=t=out:st=41:d=4" \
+  -ac 2 -b:a 112k public/assets/music.mp3
+```
+- بديل بدون حقوق: `node tools/make-music.mjs` يولّد مقطوعة عود أصلية خاصة بالدعوة.
 - لاستخدام مقطوعة أخرى: استبدلي الملف بنفس الاسم `public/assets/music.mp3` (يفضّل أقل من 3MB، 30–60 ثانية) — يشتغل تلقائيًا بدون تعديل كود.
 - لتشغيل مقطع محدد من الأغنية (مثلًا الكورس): `music.startAt` = رقم الثانية، و`music.endAt` = ثانية النهاية ثم يعيد من `startAt`.
   مثال: `startAt: 46, endAt: 78` → يشغّل 32 ثانية فقط ويعيدها بشكل متصل.
