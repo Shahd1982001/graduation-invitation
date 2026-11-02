@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { grad } from '../config/grad.js'
 
 // مشغّل موسيقى خفيف:
-// - يبدأ بعد لمسة المستخدم (فتح اللفافة) لتجاوز قيود التشغيل التلقائي في المتصفحات
+// - يحاول التشغيل فور فتح الرابط، ولو منع المتصفح ينتظر أول لمسة/نقرة في أي مكان
 // - صوت خفيف مع fade-in، وتكرار لانهائي
 // - يتذكّر اختيار الزائر (تشغيل/إيقاف) في localStorage
 // - لو الملف غير موجود يختفي الزر بصمت
@@ -11,7 +11,7 @@ import { grad } from '../config/grad.js'
 // - كتم الزائر قرار نهائي (userManuallyMuted): لا يعود التشغيل تلقائيًا إطلاقًا حتى يضغط بنفسه
 const KEY = 'invite-music'
 
-export default function MusicPlayer({ start }) {
+export default function MusicPlayer({ start = true }) {
   const audioRef = useRef(null)
   const [available, setAvailable] = useState(true)
   const [playing, setPlaying] = useState(false)
@@ -87,7 +87,8 @@ export default function MusicPlayer({ start }) {
     let preference = 'on'
     try { preference = localStorage.getItem(KEY) || 'on' } catch { /* ignore */ }
     if (preference === 'off') { mutedRef.current = true; return }
-    if (!start || playingRef.current) return
+    if (playingRef.current) return
+    // محاولة فورية عند فتح الرابط — لو منعها المتصفح، شبكة الأمان (أول لمسة) تتولّى الأمر
     play()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [start, available])

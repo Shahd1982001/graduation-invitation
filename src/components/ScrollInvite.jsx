@@ -31,8 +31,8 @@ export default function ScrollInvite({ reduce }) {
         <button className="bow-tap" onClick={untie} aria-label="اضغطي على الفيونكة لفتح الدعوة" />
       )}
 
-      {/* الموسيقى تبدأ بعد لمسة الفتح (المتصفحات تمنع التشغيل التلقائي بدون تفاعل) */}
-      <MusicPlayer start={phase !== 'closed'} />
+      {/* الموسيقى تحاول البدء فور فتح الرابط، ومع منع المتصفح تبدأ عند أول لمسة */}
+      <MusicPlayer />
       {phase !== 'open' && <p className="hint" aria-live="polite">اضغطي على الفيونكة لفتح الدعوة</p>}
     </main>
   )
