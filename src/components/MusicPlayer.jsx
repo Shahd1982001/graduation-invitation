@@ -7,12 +7,17 @@ import { grad } from '../config/grad.js'
 // - يتذكّر اختيار الزائر (تشغيل/إيقاف) في localStorage
 // - لو الملف غير موجود يختفي الزر بصمت
 // - يدعم البدء من منتصف الملف وتحديد نهاية المقطع (startAt / endAt بالثواني)
+// - شبكة أمان: لو منع المتصفح التشغيل، ننتظر أول لمسة/نقرة في أي مكان بالشاشة (نمط onFirstGesture)
+// - كتم الزائر قرار نهائي (userManuallyMuted): لا يعود التشغيل تلقائيًا إطلاقًا حتى يضغط بنفسه
 const KEY = 'invite-music'
 
 export default function MusicPlayer({ start }) {
   const audioRef = useRef(null)
   const [available, setAvailable] = useState(true)
   const [playing, setPlaying] = useState(false)
+  // كتم يدوي من الزائر: يمنع أي محاولة تشغيل تلقائية لاحقة (محفوظ في localStorage)
+  const mutedRef = useRef(false)
+  const playingRef = useRef(false)
   const volume = grad.music?.volume ?? 0.55
   const startAt = Math.max(0, Number(grad.music?.startAt) || 0)
   const endAt = Math.max(0, Number(grad.music?.endAt) || 0)
@@ -43,15 +48,18 @@ export default function MusicPlayer({ start }) {
     requestAnimationFrame(step)
   }
 
-  const play = async () => {
+  const play = async ({ manual = false } = {}) => {
     const audio = audioRef.current
     if (!audio) return false
+    if (!manual && mutedRef.current) return false
     try {
       audio.volume = 0
       if (startAt) seekStart()
       await audio.play()
       fadeTo(volume)
       setPlaying(true)
+      playingRef.current = true
+      mutedRef.current = false
       try { localStorage.setItem(KEY, 'on') } catch { /* ignore */ }
       return true
     } catch {
@@ -63,23 +71,44 @@ export default function MusicPlayer({ start }) {
   const stop = () => {
     const audio = audioRef.current
     if (!audio) return
+    mutedRef.current = true
     fadeTo(0, 450)
     window.setTimeout(() => audio.pause(), 460)
     setPlaying(false)
+    playingRef.current = false
     try { localStorage.setItem(KEY, 'off') } catch { /* ignore */ }
   }
 
-  const toggle = () => (playing ? stop() : play())
+  const toggle = () => (playing ? stop() : play({ manual: true }))
 
   // يبدأ عند فتح اللفافة، إلا لو الزائر أوقفها سابقًا
   useEffect(() => {
-    if (!start || !available) return
+    if (!available) return
     let preference = 'on'
     try { preference = localStorage.getItem(KEY) || 'on' } catch { /* ignore */ }
-    if (preference === 'off') return
+    if (preference === 'off') { mutedRef.current = true; return }
+    if (!start || playingRef.current) return
     play()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [start, available])
+
+  // شبكة أمان: لو منع المتصفح التشغيل التلقائي، ننتظر أول تفاعل في أي مكان بالشاشة
+  useEffect(() => {
+    if (!available) return
+    const onFirstGesture = () => {
+      if (mutedRef.current || playingRef.current) return
+      play()
+    }
+    window.addEventListener('click', onFirstGesture)
+    window.addEventListener('touchstart', onFirstGesture, { passive: true })
+    window.addEventListener('keydown', onFirstGesture)
+    return () => {
+      window.removeEventListener('click', onFirstGesture)
+      window.removeEventListener('touchstart', onFirstGesture)
+      window.removeEventListener('keydown', onFirstGesture)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [available])
 
   // إيقاف عند مغادرة الصفحة (توفير بطارية)
   useEffect(() => {
