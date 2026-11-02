@@ -24,7 +24,8 @@ export const grad = {
   },
   // بطاقة «نموذج عرض» — خليها null لتختفي
   demo: { badge: 'نموذج عرض', note: 'نموذج دعوة جاهز للتخصيص — للطلب تواصلوا على الخاص', ctaText: 'اطلب دعوتك', ctaUrl: '' },
-  // الموسيقى: ضعي ملفك في public/assets/music.mp3 (أو غيّري src)
-  music: { src: '/assets/music.mp3', title: 'موسيقى الدعوة', volume: 0.55 },
+  // الموسيقى: مقطوعة أصلية مولّدة خاصة بالدعوة (بدون حقوق) — استبدليها بملفك بنفس الاسم
+  // لتوليد نسخة أخرى: node tools/make-music.mjs
+  music: { src: '/assets/music.mp3', title: 'موسيقى الدعوة', volume: 0.5 },
   autoAdvanceMs: 2200,   // مدة الوقوف بين كل صفحة وأخرى (ميلي ثانية)
 }
